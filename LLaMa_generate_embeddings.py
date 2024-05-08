@@ -56,7 +56,7 @@ def load_llama_model(model_name: str):
     Returns:
     Tuple[LlamaForCausalLM, LlamaTokenizer]. A tuple containing the loaded LLaMa model and its tokenizer.
     '''
-    model_path = "/data/ben_levinstein/llama/models/hf_weights" #CHANGE THIS TO WHEREVER YOU STORE THE HUGGING FACE WEIGHTS
+    model_path = "/Users/ganning/Downloads/model/" #CHANGE THIS TO WHEREVER YOU STORE THE HUGGING FACE WEIGHTS
     tokenizer = LlamaTokenizer.from_pretrained(f"{model_path}/{model_name}")
     model = LlamaForCausalLM.from_pretrained(f"{model_path}/{model_name}")
     return model, tokenizer
@@ -67,7 +67,8 @@ def init_model(model_name: str):
     Initializes and returns the model and tokenizer.
     """
     try:
-        if model_name in ['7B', '13B', '30B']:
+        # if model_name in ['7B', '13B', '30B']:
+        if 'llama' in model_name:
             model, tokenizer = load_llama_model(model_name)
         else:
             model = OPTForCausalLM.from_pretrained("facebook/opt-"+model_name)
@@ -194,15 +195,24 @@ def main():
     parser.add_argument("--remove_period", action="store_true", help="Include this flag if you want to extract embedding for the last token before the final period.")
     args = parser.parse_args()
 
-    model_name = args.model if args.model is not None else config_parameters["model"]
-    should_remove_period = args.remove_period if args.remove_period is not None else config_parameters["remove_period"]
-    layers_to_process = [int(x) for x in args.layers] if args.layers is not None else config_parameters["layers_to_use"]
-    dataset_names = args.dataset_names if args.dataset_names is not None else config_parameters["list_of_datasets"]
-    true_false = args.true_false if args.true_false is not None else config_parameters["true_false"]
-    BATCH_SIZE = args.batch_size if args.batch_size is not None else config_parameters["batch_size"]
+    # model_name = args.model if args.model is not None else config_parameters["model"]
+    # should_remove_period = args.remove_period if args.remove_period is not None else config_parameters["remove_period"]
+    # layers_to_process = [int(x) for x in args.layers] if args.layers is not None else config_parameters["layers_to_use"]
+    # dataset_names = args.dataset_names if args.dataset_names is not None else config_parameters["list_of_datasets"]
+    # true_false = args.true_false if args.true_false is not None else config_parameters["true_false"]
+    # BATCH_SIZE = args.batch_size if args.batch_size is not None else config_parameters["batch_size"]
+
+    model_name = config_parameters["model"]
+    should_remove_period =config_parameters["remove_period"]
+    layers_to_process =config_parameters["layers_to_use"]
+    dataset_names =config_parameters["list_of_datasets"]
+    true_false =config_parameters["true_false"]
+    BATCH_SIZE =config_parameters["batch_size"]
     dataset_path = Path(config_parameters["dataset_path"])
     output_path = Path(config_parameters["processed_dataset_path"])
 
+    # print("config_parameters", config_parameters)
+    # print("args", args)
 
     model_output_per_layer: Dict[int, pd.DataFrame] = {}
 

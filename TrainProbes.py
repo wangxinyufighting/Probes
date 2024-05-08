@@ -21,6 +21,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import accuracy_score,\
+    classification_report, confusion_matrix, roc_auc_score, f1_score, precision_score, recall_score, precision_recall_curve
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from pathlib import Path
@@ -61,6 +63,8 @@ def load_config(config_file):
 def load_datasets(dataset_names, layers_to_process, should_remove_period, input_path, model_name, idx):
     datasets = []
     dataset_paths = []
+    # if 'llama2-7b' in model_name:
+    #     model_name = 'llama2-7b'
     for dataset_name in dataset_names:
         try:
             if should_remove_period:
@@ -323,13 +327,21 @@ def main():
     parser.add_argument("--repeat_each", type=int, help="How many times to train a randomly initialized probe for each dataset.")
     args = parser.parse_args()
 
-    model_name = args.model if args.model is not None else config_parameters["model"]
-    should_remove_period = args.remove_period if args.remove_period is not None else config_parameters["remove_period"]
-    layers_to_process = [int(x) for x in args.layers] if args.layers is not None else config_parameters["layers_to_use"]
-    dataset_names = args.dataset_names if args.dataset_names is not None else config_parameters["list_of_datasets"]
-    test_first_only = args.test_first_only if args.test_first_only is not None else config_parameters["test_first_only"]
-    save_probes = args.save_probes if args.save_probes is not None else config_parameters["save_probes"]
-    repeat_each = args.repeat_each if args.repeat_each is not None else config_parameters["repeat_each"]
+    # model_name = args.model if args.model is not None else config_parameters["model"]
+    # should_remove_period = args.remove_period if args.remove_period is not None else config_parameters["remove_period"]
+    # layers_to_process = [int(x) for x in args.layers] if args.layers is not None else config_parameters["layers_to_use"]
+    # dataset_names = args.dataset_names if args.dataset_names is not None else config_parameters["list_of_datasets"]
+    # test_first_only = args.test_first_only if args.test_first_only is not None else config_parameters["test_first_only"]
+    # save_probes = args.save_probes if args.save_probes is not None else config_parameters["save_probes"]
+    # repeat_each = args.repeat_each if args.repeat_each is not None else config_parameters["repeat_each"]
+
+    model_name = config_parameters["model"]
+    should_remove_period =config_parameters["remove_period"]
+    layers_to_process =config_parameters["layers_to_use"]
+    dataset_names =config_parameters["list_of_datasets"]
+    test_first_only =config_parameters["test_first_only"]
+    save_probes =config_parameters["save_probes"]
+    repeat_each = config_parameters["repeat_each"]
     input_path = Path(config_parameters["processed_dataset_path"])
     probes_path = Path(config_parameters["probes_dir"])
     
@@ -381,11 +393,16 @@ def main():
 
                 # Compute ROC curve and ROC area
                 roc_auc, fpr, tpr = compute_roc_curve(test_labels, model.predict(test_embeddings))
+                precision, recall, thresholds = precision_recall_curve(test_labels, model.predict(test_embeddings))
+                auc_precision_recall = auc(recall, precision)
+
 
                 # Compute test set accuracy using the optimal threshold
                 test_accuracy = accuracy_score(test_labels, model.predict(test_embeddings) > optimal_threshold)
 
                 results.append((dataset_names[count], i, accuracy, roc_auc, optimal_threshold, test_accuracy))
+
+                print(f'layer:{layers_to_process[idx]}, repeat:{i}, auroc:{roc_auc:.5%}, auc_pr:{auc_precision_recall:.5%}')
 
             # Save the best model
             if save_probes:
@@ -422,6 +439,10 @@ def main():
         if not test_first_only:
             avg_res = print_results(results, dataset_names, repeat_each, layers_to_process[idx])
             overall_res.extend(avg_res)
+
+    # print(avg_res)
+
+        print(results)
 
         
     logger.info("Execution completed.")

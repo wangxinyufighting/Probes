@@ -24,7 +24,7 @@ Requirements:
 """
 
 import torch
-from transformers import AutoTokenizer, OPTForCausalLM
+from transformers import AutoTokenizer, OPTForCausalLM, AutoModelForCausalLM
 import pandas as pd
 import numpy as np
 from typing import Dict, List
@@ -37,6 +37,12 @@ import argparse
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     filename='embedding_extraction.log')
+
+def init_model_llama(model_path):
+    model = AutoModelForCausalLM.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+    return model, tokenizer
 
 def init_model(model_name: str):
     """
@@ -117,6 +123,8 @@ def save_data(df, output_path: Path, dataset_name: str, model_name: str, layer: 
     """
     output_path.mkdir(parents=True, exist_ok=True)
     filename_suffix = "_rmv_period" if remove_period else ""
+    if 'llama2-7b' in model_name:
+        model_name = 'llama2-7b'
     output_file = output_path / f"embeddings_{dataset_name}{model_name}_{abs(layer)}{filename_suffix}.csv"
     try:
         df.to_csv(output_file, index=False)
@@ -176,7 +184,11 @@ def main():
 
     model_output_per_layer: Dict[int, pd.DataFrame] = {}
 
-    model, tokenizer = init_model(model_name)
+    if 'llama' in model_name:
+        model, tokenizer = init_model_llama(model_name)
+        tokenizer.pad_token = tokenizer.eos_token
+    else:
+        model, tokenizer = init_model(model_name)
     if model is None or tokenizer is None:
         logging.error("Model or tokenizer initialization failed.")
         return
