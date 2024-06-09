@@ -1,0 +1,14 @@
+2024-06-09 21:27:55,762 - ERROR - Model or tokenizer initialization failed.
+2024-06-09 21:30:05,708 - INFO - Processing batch 0
+2024-06-09 21:33:52,999 - INFO - Processing batch 10
+2024-06-09 21:37:35,536 - INFO - Processing batch 20
+2024-06-09 21:39:35,084 - INFO - Processing batch 0
+2024-06-09 21:43:03,177 - INFO - Processing batch 10
+2024-06-09 21:48:40,435 - INFO - Processing batch 20
+2024-06-09 21:54:01,911 - INFO - Processing batch 30
+2024-06-09 21:57:52,210 - INFO - Processing batch 40
+2024-06-09 22:01:31,149 - INFO - Processing batch 50
+2024-06-09 22:07:36,239 - INFO - Processing batch 60
+2024-06-09 22:12:19,311 - INFO - Processing batch 70
+2024-06-09 22:18:04,531 - INFO - Processing batch 80
+2024-06-09 22:24:24,999 - INFO - Processing batch 90

@@ -56,7 +56,7 @@ def load_llama_model(model_name: str):
     Returns:
     Tuple[LlamaForCausalLM, LlamaTokenizer]. A tuple containing the loaded LLaMa model and its tokenizer.
     '''
-    model_path = "/Users/ganning/Downloads/model/" #CHANGE THIS TO WHEREVER YOU STORE THE HUGGING FACE WEIGHTS
+    model_path = "/home/wxy/models" #CHANGE THIS TO WHEREVER YOU STORE THE HUGGING FACE WEIGHTS
     tokenizer = LlamaTokenizer.from_pretrained(f"{model_path}/{model_name}")
     model = LlamaForCausalLM.from_pretrained(f"{model_path}/{model_name}")
     return model, tokenizer
@@ -68,7 +68,7 @@ def init_model(model_name: str):
     """
     try:
         # if model_name in ['7B', '13B', '30B']:
-        if 'llama' in model_name:
+        if 'llama' in model_name or 'vicuna' in model_name:
             model, tokenizer = load_llama_model(model_name)
         else:
             model = OPTForCausalLM.from_pretrained("facebook/opt-"+model_name)
